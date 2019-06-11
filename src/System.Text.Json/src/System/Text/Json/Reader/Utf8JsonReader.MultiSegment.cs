@@ -97,6 +97,13 @@ namespace System.Text.Json
             ValueSpan = default;
             ValueSequence = default;
 
+            // Handle BOM if present
+            int utf8BomLength = JsonConstants.Utf8Bom.Length;
+            if (_buffer.Length >= utf8BomLength && JsonConstants.Utf8Bom.SequenceEqual(_buffer.Slice(0, utf8BomLength)))
+            {
+                _consumed += JsonConstants.Utf8Bom.Length;
+            }
+
             if (!HasMoreDataMultiSegment())
             {
                 goto Done;
