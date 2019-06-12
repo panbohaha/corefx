@@ -770,17 +770,22 @@ namespace System.Text.Json
             _inObject = _bitStack.Pop();
         }
 
-        private bool ReadSingleSegment()
+        private void HandleBOMIfPresent()
         {
-            bool retVal = false;
-            ValueSpan = default;
-
             // Handle BOM if present
             int utf8BomLength = JsonConstants.Utf8Bom.Length;
             if (_buffer.Length >= utf8BomLength && JsonConstants.Utf8Bom.SequenceEqual(_buffer.Slice(0, utf8BomLength)))
             {
                 _consumed += JsonConstants.Utf8Bom.Length;
             }
+        }
+
+        private bool ReadSingleSegment()
+        {
+            bool retVal = false;
+            ValueSpan = default;
+
+            HandleBOMIfPresent();
 
             if (!HasMoreData())
             {
