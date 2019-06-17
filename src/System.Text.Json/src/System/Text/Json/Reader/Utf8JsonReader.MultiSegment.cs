@@ -97,8 +97,6 @@ namespace System.Text.Json
             ValueSpan = default;
             ValueSequence = default;
 
-            HandleBOMIfPresent();
-
             if (!HasMoreDataMultiSegment())
             {
                 goto Done;
