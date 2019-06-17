@@ -93,6 +93,7 @@ namespace System.Text.Json
             int bytesInBuffer = 0;
             long totalBytesRead = 0;
             int clearMax = 0;
+            int loopCount = 0;
 
             try
             {
@@ -132,11 +133,25 @@ namespace System.Text.Json
                         clearMax = bytesInBuffer;
                     }
 
+                    int start = 0;
+                    if (loopCount == 0)
+                    {
+                        // Handle the UTF-8 BOM if present
+                        int utf8BomLength = JsonConstants.Utf8Bom.Length;
+                        if (buffer.Length >= utf8BomLength && JsonConstants.Utf8Bom.SequenceEqual(buffer.AsSpan(0, utf8BomLength).Slice(0, utf8BomLength)))
+                        {
+                            start += utf8BomLength;
+                            bytesInBuffer -= utf8BomLength;
+                        }
+                    }
+
+                    loopCount++;
+
                     // Process the data available
                     ReadCore(
                         ref readerState,
                         isFinalBlock,
-                        new Span<byte>(buffer, 0, bytesInBuffer),
+                        new Span<byte>(buffer, start, bytesInBuffer),
                         options,
                         ref readStack);
 
