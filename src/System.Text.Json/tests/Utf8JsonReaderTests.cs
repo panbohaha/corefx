@@ -1816,40 +1816,26 @@ namespace System.Text.Json.Tests
             }
             );
 
+            Assert.ThrowsAny<JsonException>(() =>
+            {
+                ReadOnlySpan<byte> Utf8BomAndValue = new byte[] { 0xEF, 0xBB, 0xBF};
+                var json = new Utf8JsonReader(Utf8BomAndValue, true, default);
+                json.Read();
+            }
+            );
+
+            Assert.ThrowsAny<JsonException>(() =>
+            {
+                ReadOnlySpan<byte> Utf8BomAndValue = new byte[] { 0xEF, 0xBB, 0xBF};
+                var json = new Utf8JsonReader(Utf8BomAndValue, false, default);
+                json.Read();
+            }
+            );
+
             byte[] Utf8BomAndValueArray = new byte[] { 0xEF, 0xBB, 0xBF, 49 };
             Stream stream = new MemoryStream(Utf8BomAndValueArray);
             var jsonTask = JsonSerializer.ReadAsync<byte>(stream);
-            Assert.Equal(1, jsonTask.Result); // 49 is (byte)'1'. Is this really expected or is my input/understanding wrong?
-        }
-
-        [Fact]
-        public static void TestEmptyJsonWithBOM()
-        {
-            //ReadOnlySpan<byte> Utf8BomAndValue = new byte[] { 0xEF, 0xBB, 0xBF };
-            //var json = new Utf8JsonReader(Utf8BomAndValue, true, default);
-            //try
-            //{
-            //    while (json.Read())
-            //        ;
-            //    Assert.True(false, "Expected JsonException was not thrown with single-segment data.");
-            //}
-            //catch (JsonException ex)
-            //{
-            //    Assert.Equal(0, ex.LineNumber);
-            //    Assert.Equal(0, ex.BytePositionInLine);
-            //}
-
-            byte[] Utf8BomAndValueArray = new byte[] { 0xEF, 0xBB, 0xBF };
-            Stream stream = new MemoryStream(Utf8BomAndValueArray);
-            try
-            {
-                var jsonTask = JsonSerializer.ReadAsync<byte>(stream);
-                Assert.True(false, "Expected JsonException was not thrown with single-segment data.");
-            }
-            catch (JsonException ex)
-            {
-                Assert.Equal(0, ex.LineNumber);
-            }
+            Assert.Equal(1, jsonTask.Result);
         }
 
         [Theory]
