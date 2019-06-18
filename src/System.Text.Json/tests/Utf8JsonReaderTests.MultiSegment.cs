@@ -1081,19 +1081,6 @@ namespace System.Text.Json.Tests
             }
         }
 
-        [Fact]
-        public static void TestBOMWithMultiSegment()
-        {
-            ReadOnlySpan<byte> Utf8BomAndValue = new byte[] { 0xEF, 0xBB, 0xBF, (byte)'1' };
-            ReadOnlySequence<byte> sequence = JsonTestHelper.GetSequence(Utf8BomAndValue.ToArray(), 3);
-            Assert.False(sequence.IsSingleSegment);
-            var reader = new Utf8JsonReader(sequence, true, default);
-            Assert.True(reader.Read());
-            Assert.Equal(4, reader.BytesConsumed);
-            Assert.Equal(1, reader.ValueSpan.Length);
-            Assert.Equal(Utf8BomAndValue[3], reader.ValueSpan[0]);
-        }
-
         [Theory]
         [MemberData(nameof(SingleJsonTokenStartIndex))]
         public static void TestTokenStartIndexMultiSegment_SingleValue(string jsonString, int expectedIndex)
